@@ -30,6 +30,8 @@ cd /usr/local/lib/web/backend
 ./run.py --debug
 ```
 
+The runtime desktop image now ships with common development tools such as `git`, `vim`, `ping`, `telnet`, `node`, `npm`, `yarn`, and `pnpm`, so basic setup can happen directly inside the container shell.
+
 ## Develop frontend
 
 ```
