@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Settings
+Comment=Control and monitor system settings
+Exec=gnome-control-center
+Terminal=false
+Categories=GNOME;GTK;Settings;
+Icon=/usr/share/icons/hicolor/scalable/apps/org.gnome.Settings.svg
+StartupNotify=true

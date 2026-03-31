@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Files
+Comment=Browse files
+Exec=nautilus --new-window %U
+Terminal=false
+Categories=GNOME;GTK;Utility;Core;
+MimeType=inode/directory;
+Icon=/usr/share/icons/hicolor/scalable/apps/org.gnome.Nautilus.svg
+StartupNotify=true

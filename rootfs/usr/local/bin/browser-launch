@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+if command -v google-chrome-stable >/dev/null 2>&1; then
+    exec google-chrome-stable --no-sandbox "$@"
+fi
+
+if command -v chromium >/dev/null 2>&1; then
+    exec chromium --no-sandbox "$@"
+fi
+
+if command -v chromium-browser >/dev/null 2>&1; then
+    exec chromium-browser --no-sandbox "$@"
+fi
+
+exec firefox "$@"

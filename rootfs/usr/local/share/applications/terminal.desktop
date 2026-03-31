@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Terminal
+Comment=Use the command line
+Exec=gnome-terminal
+Terminal=false
+Categories=GNOME;GTK;System;TerminalEmulator;
+Icon=/usr/share/icons/hicolor/scalable/apps/org.gnome.Terminal.svg
+StartupNotify=true
