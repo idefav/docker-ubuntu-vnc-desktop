@@ -1,15 +1,10 @@
 # Get code
 
 ```
-git clone --recursive https://github.com/fcwu/docker-ubuntu-vnc-desktop
+git clone https://github.com/idefav/docker-ubuntu-vnc-desktop.git
 ```
 
-or, if you have already cloned it, get submodules contents:
-
-```
-git submodule init
-git submodule update
-```
+This fork does not require submodule initialization.
 
 # Test local code
 

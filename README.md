@@ -2,6 +2,8 @@
 
 Ubuntu 24.04 GNOME desktop in Docker, exposed through noVNC and VNC.
 
+Repository: `https://github.com/idefav/docker-ubuntu-vnc-desktop`
+
 ## Features
 
 - Ubuntu 24.04
@@ -37,6 +39,13 @@ Browse:
 
 ```text
 http://127.0.0.1:6080/
+```
+
+Default desktop credentials in the example above:
+
+```text
+username: ubuntu
+password: ubuntu
 ```
 
 ## Build With Host Proxy
@@ -88,3 +97,7 @@ Then mount it to `/etc/nginx/ssl` and set `SSL_PORT`.
 ## Development
 
 See [DEVELOPMENT.md](./DEVELOPMENT.md).
+
+## License
+
+This project is distributed under the terms in [LICENSE](./LICENSE).
