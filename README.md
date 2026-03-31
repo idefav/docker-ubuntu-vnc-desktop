@@ -114,6 +114,7 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md).
 - Any pushed `v*` tag builds and pushes Docker images with the exact same tag
 - Images are always published to `ghcr.io/idefav/docker-ubuntu-vnc-desktop`
 - If `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` are configured in repository secrets, the same image is also published to Docker Hub
+- To let tag-driven workflows such as `docker-publish` run after Release Please creates a release tag, configure a `RELEASE_PLEASE_TOKEN` secret with repo write permission instead of relying only on the default `GITHUB_TOKEN`
 
 ## License
 
