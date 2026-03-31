@@ -98,6 +98,16 @@ Then mount it to `/etc/nginx/ssl` and set `SSL_PORT`.
 
 See [DEVELOPMENT.md](./DEVELOPMENT.md).
 
+## Release Automation
+
+- Pull requests to `main` automatically run a Docker build validation workflow
+- Pushes to `main` automatically maintain a Release PR via Release Please
+- Version increments follow Conventional Commits so `feat:` bumps minor, `fix:` bumps patch, and `feat!:` or `BREAKING CHANGE:` bumps major
+- When the Release PR is merged, GitHub creates a release tag in `v1.0.0` format
+- Publishing that GitHub Release automatically builds and pushes Docker images with the same tag
+- Images are always published to `ghcr.io/idefav/docker-ubuntu-vnc-desktop`
+- If `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` are configured in repository secrets, the same image is also published to Docker Hub
+
 ## License
 
 This project is distributed under the terms in [LICENSE](./LICENSE).
