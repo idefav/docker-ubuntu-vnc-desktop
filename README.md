@@ -11,6 +11,10 @@ Repository: `https://github.com/idefav/docker-ubuntu-vnc-desktop`
 - noVNC with server-side resize first, local scaling fallback
 - Desktop and Dock favorites for Files, Terminal, Browser, VS Code, Settings
 - Browser launcher prefers Chrome on `amd64`, Chromium on `arm64`
+- Built-in developer toolbox in the runtime image:
+  - editors and shell tools: `vim`, `nano`, `less`, `tmux`, `tree`, `ripgrep`, `fd`
+  - version control and package tools: `git`, `node`, `npm`, `npx`, `yarn`, `pnpm`
+  - network and diagnostics: `ping`, `telnet`, `nc`, `ssh`, `dig`, `traceroute`, `htop`, `strace`
 - Domestic-first build sources:
   - `apt`: Tsinghua Ubuntu mirror over `http`
   - `apt` on arm64: Tsinghua Ubuntu Ports mirror over `http`
@@ -68,6 +72,8 @@ The Makefile always builds with `docker build --network=host`, so host-local pro
 - `VNC_PASSWORD`: optional VNC password
 - `HTTP_PASSWORD`: optional HTTP basic auth password
 - `RELATIVE_URL_ROOT`: optional subpath deployment prefix
+
+The desktop container now includes a broader runtime development toolset, so common shell work can happen directly inside the GNOME terminal or VS Code terminal without extra package installation.
 
 ## VNC Viewer
 

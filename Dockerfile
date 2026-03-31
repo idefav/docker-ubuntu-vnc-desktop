@@ -7,7 +7,7 @@ ARG HTTPS_PROXY
 ARG ALL_PROXY
 ARG NO_PROXY
 ARG NVM_VERSION=v0.39.7
-ARG NODE_VERSION=20.19.0
+ARG NODE_VERSION=v24
 ARG NVM_NODEJS_ORG_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/nodejs-release
 ARG NPM_REGISTRY=https://registry.npmmirror.com
 ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
@@ -28,6 +28,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     NO_PROXY=${NO_PROXY} \
     no_proxy=${NO_PROXY} \
     NVM_DIR=/usr/local/nvm \
+    PATH=/usr/local/nvm/current/bin:${PATH} \
     NVM_NODEJS_ORG_MIRROR=${NVM_NODEJS_ORG_MIRROR} \
     NPM_CONFIG_REGISTRY=${NPM_REGISTRY} \
     PIP_INDEX_URL=${PIP_INDEX_URL} \
@@ -53,46 +54,26 @@ RUN set -eux; \
         apt-get install -y --no-install-recommends "$pkg"; \
         echo ">>> package installed: $pkg"; \
     }; \
-    install_pkg software-properties-common; \
-    install_pkg curl; \
-    install_pkg ca-certificates; \
-    install_pkg gnupg; \
-    install_pkg gpg-agent; \
-    install_pkg jq; \
-    install_pkg apache2-utils; \
-    install_pkg supervisor; \
-    install_pkg nginx; \
-    install_pkg sudo; \
-    install_pkg net-tools; \
-    install_pkg zenity; \
-    install_pkg xz-utils; \
-    install_pkg dbus-x11; \
-    install_pkg dbus-user-session; \
-    install_pkg dbus; \
-    install_pkg x11-utils; \
-    install_pkg alsa-utils; \
-    install_pkg mesa-utils; \
-    install_pkg libgl1-mesa-dri; \
-    install_pkg gdk-pixbuf2.0-bin; \
-    install_pkg librsvg2-common; \
-    install_pkg tigervnc-standalone-server; \
-    install_pkg tigervnc-tools; \
-    install_pkg novnc; \
-    install_pkg websockify; \
-    install_pkg vim-tiny; \
-    install_pkg fonts-ubuntu-classic; \
-    install_pkg fonts-wqy-zenhei; \
-    install_pkg python3-pip; \
-    install_pkg python3-dev; \
-    install_pkg build-essential; \
-    install_pkg xdg-user-dirs; \
-    install_pkg ubuntu-session; \
-    install_pkg gnome-shell; \
-    install_pkg gnome-terminal; \
-    install_pkg nautilus; \
-    install_pkg gnome-control-center; \
-    install_pkg gnome-shell-ubuntu-extensions; \
-    install_pkg desktop-file-utils; \
+    base_packages=' \
+        software-properties-common curl ca-certificates gnupg gpg-agent jq \
+        apache2-utils supervisor nginx sudo net-tools zenity xz-utils \
+        dbus-x11 dbus-user-session dbus x11-utils alsa-utils mesa-utils \
+        libgl1-mesa-dri gdk-pixbuf2.0-bin librsvg2-common \
+        tigervnc-standalone-server tigervnc-tools novnc websockify \
+        fonts-ubuntu-classic fonts-wqy-zenhei python3-pip python3-dev \
+        python3-venv build-essential pkg-config cmake gdb \
+        xdg-user-dirs desktop-file-utils'; \
+    desktop_packages=' \
+        ubuntu-session gnome-shell gnome-terminal nautilus \
+        gnome-control-center gnome-shell-ubuntu-extensions'; \
+    dev_packages=' \
+        git vim nano less tree file ripgrep fd-find tmux bash-completion \
+        man-db wget zip unzip rsync openssh-client iputils-ping iproute2 \
+        dnsutils traceroute inetutils-telnet netcat-openbsd lsof procps \
+        psmisc htop strace'; \
+    for pkg in $base_packages $desktop_packages $dev_packages; do \
+        install_pkg "$pkg"; \
+    done; \
     rm -rf /var/lib/apt/lists/*
 
 RUN install -m 0755 -d /etc/apt/keyrings \
@@ -149,7 +130,7 @@ ARG HTTPS_PROXY
 ARG ALL_PROXY
 ARG NO_PROXY
 ARG NVM_VERSION=v0.39.7
-ARG NODE_VERSION=20.19.0
+ARG NODE_VERSION=v24
 ARG NVM_NODEJS_ORG_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/nodejs-release
 ARG NPM_REGISTRY=https://registry.npmmirror.com
 
@@ -160,6 +141,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     NO_PROXY=${NO_PROXY} \
     no_proxy=${NO_PROXY} \
     NVM_DIR=/usr/local/nvm \
+    PATH=/usr/local/nvm/current/bin:${PATH} \
     NVM_NODEJS_ORG_MIRROR=${NVM_NODEJS_ORG_MIRROR} \
     NPM_CONFIG_REGISTRY=${NPM_REGISTRY}
 
@@ -183,16 +165,26 @@ RUN mkdir -p "$NVM_DIR" \
     && curl -fsSL "https://gitee.com/mirrors/nvm/raw/${NVM_VERSION}/install.sh" -o /tmp/install-nvm.sh \
     && PROFILE=/dev/null bash /tmp/install-nvm.sh \
     && . "$NVM_DIR/nvm.sh" \
-    && nvm install "$NODE_VERSION" \
-    && nvm alias default "$NODE_VERSION" \
+    && RESOLVED_NODE_VERSION="$NODE_VERSION" \
+    && if ! printf '%s' "$NODE_VERSION" | grep -Eq '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then \
+        NODE_MAJOR="${NODE_VERSION#v}"; \
+        RESOLVED_NODE_VERSION="$(nvm ls-remote | awk -v major="$NODE_MAJOR" '$1 ~ "^v" major "\\." { version=$1 } END { print version }')"; \
+        test -n "$RESOLVED_NODE_VERSION"; \
+      fi \
+    && echo ">>> resolved Node.js version: $RESOLVED_NODE_VERSION" \
+    && nvm install "$RESOLVED_NODE_VERSION" \
+    && nvm alias default "$RESOLVED_NODE_VERSION" \
+    && NODE_BIN_DIR="$(dirname "$(nvm which "$RESOLVED_NODE_VERSION")")" \
+    && ln -sfn "$(dirname "$NODE_BIN_DIR")" "$NVM_DIR/current" \
     && npm config set registry "$NPM_REGISTRY" \
-    && npm install -g yarn@1 \
+    && npm install -g yarn@1 pnpm \
     && yarn config set registry "$NPM_REGISTRY" \
-    && NODE_BIN_DIR="$NVM_DIR/versions/node/$(ls -1 $NVM_DIR/versions/node | tail -n 1)/bin" \
-    && ln -sf "$NODE_BIN_DIR/node" /usr/local/bin/node \
-    && ln -sf "$NODE_BIN_DIR/npm" /usr/local/bin/npm \
-    && ln -sf "$NODE_BIN_DIR/npx" /usr/local/bin/npx \
-    && ln -sf "$NODE_BIN_DIR/yarn" /usr/local/bin/yarn \
+    && ln -sf "$NVM_DIR/current/bin/node" /usr/local/bin/node \
+    && ln -sf "$NVM_DIR/current/bin/npm" /usr/local/bin/npm \
+    && ln -sf "$NVM_DIR/current/bin/npx" /usr/local/bin/npx \
+    && ln -sf "$NVM_DIR/current/bin/corepack" /usr/local/bin/corepack \
+    && ln -sf "$NVM_DIR/current/bin/yarn" /usr/local/bin/yarn \
+    && ln -sf "$NVM_DIR/current/bin/pnpm" /usr/local/bin/pnpm \
     && rm -f /tmp/install-nvm.sh
 
 COPY web /src/web
@@ -208,6 +200,7 @@ FROM system
 LABEL maintainer="fcwu.tw@gmail.com"
 
 COPY --from=builder /src/web/dist/ /usr/local/lib/web/frontend/
+COPY --from=builder /usr/local/nvm/ /usr/local/nvm/
 COPY rootfs /
 RUN chmod +x /startup.sh \
     /usr/local/bin/xvnc.sh \
@@ -217,6 +210,16 @@ RUN chmod +x /startup.sh \
     /usr/local/bin/browser-launch \
     /usr/local/bin/system-dbus.sh \
     /usr/local/bin/system-logind.sh \
+    && if [ ! -L "$NVM_DIR/current" ]; then \
+        NODE_DIR="$NVM_DIR/versions/node/$(ls -1 "$NVM_DIR/versions/node" | tail -n 1)"; \
+        ln -sfn "$NODE_DIR" "$NVM_DIR/current"; \
+      fi \
+    && ln -sfn "$NVM_DIR/current/bin/node" /usr/local/bin/node \
+    && ln -sfn "$NVM_DIR/current/bin/npm" /usr/local/bin/npm \
+    && ln -sfn "$NVM_DIR/current/bin/npx" /usr/local/bin/npx \
+    && ln -sfn "$NVM_DIR/current/bin/corepack" /usr/local/bin/corepack \
+    && ln -sfn "$NVM_DIR/current/bin/yarn" /usr/local/bin/yarn \
+    && ln -sfn "$NVM_DIR/current/bin/pnpm" /usr/local/bin/pnpm \
     && update-desktop-database /usr/local/share/applications || true \
     && if command -v gdk-pixbuf-query-loaders >/dev/null 2>&1; then \
         gdk-pixbuf-query-loaders --update-cache || true; \
