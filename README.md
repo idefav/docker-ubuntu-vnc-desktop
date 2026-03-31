@@ -105,7 +105,7 @@ See [DEVELOPMENT.md](./DEVELOPMENT.md).
 - Version increments follow Conventional Commits so `feat:` bumps minor, `fix:` bumps patch, and `feat!:` or `BREAKING CHANGE:` bumps major
 - The manifest is bootstrapped from `0.0.0`, so the first real automated release becomes `v1.0.0`
 - When the Release PR is merged, GitHub creates a release tag in `v1.0.0` format
-- The same release workflow then builds and pushes Docker images with the exact same tag
+- Any pushed `v*` tag builds and pushes Docker images with the exact same tag
 - Images are always published to `ghcr.io/idefav/docker-ubuntu-vnc-desktop`
 - If `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` are configured in repository secrets, the same image is also published to Docker Hub
 
