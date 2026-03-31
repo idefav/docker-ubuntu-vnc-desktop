@@ -70,7 +70,7 @@ docker run --privileged --rm \
   -v /dev/shm:/dev/shm \
   -e DESKTOP_USERNAME=ubuntu \
   -e DESKTOP_PASSWORD=ubuntu \
-  dorowu/ubuntu-desktop-gnome-vnc:latest
+  idefav/ubuntu-desktop-gnome-vnc:latest
 ```
 
 ## SSL

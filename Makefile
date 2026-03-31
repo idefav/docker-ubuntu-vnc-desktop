@@ -9,7 +9,7 @@ PROXY_REWRITE_LOCALHOST ?= 0
 HOST_GATEWAY_NAME ?= host.docker.internal
 HOST_GATEWAY_MAP ?= $(HOST_GATEWAY_NAME):host-gateway
 
-REPO  ?= dorowu/ubuntu-desktop-gnome-vnc
+REPO  ?= idefav/ubuntu-desktop-gnome-vnc
 TAG   ?= latest
 BUILD_NETWORK ?= host
 HTTP_PROXY ?= $(HOST_HTTP_PROXY)
