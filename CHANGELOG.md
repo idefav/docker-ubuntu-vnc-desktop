@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/idefav/docker-ubuntu-vnc-desktop/compare/v1.1.0...v1.2.0) (2026-03-31)
+
+
+### Features
+
+* allow release tags to trigger publish workflow ([6723ceb](https://github.com/idefav/docker-ubuntu-vnc-desktop/commit/6723ceb14501a6fa99a30e9d5dca05c819c5b7b7))
+
 ## [1.1.0](https://github.com/idefav/docker-ubuntu-vnc-desktop/compare/v1.0.0...v1.1.0) (2026-03-31)
 
 
