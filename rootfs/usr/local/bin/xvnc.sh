@@ -35,8 +35,12 @@ exec "$XVNC_BIN" :1 \
     -rfbport 5900 \
     -localhost no \
     -AlwaysShared \
+    -AcceptCutText=1 \
     -AcceptSetDesktopSize=1 \
     -desktop "ubuntu-desktop-vnc" \
+    -SendCutText=1 \
+    -SendPrimary=1 \
+    -SetPrimary=1 \
     $SECURITY_ARGS \
     ${XVNC_ARGS:-} \
     "$@"

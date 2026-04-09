@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" style="width: 100%; height: 100%; background-color: #000;">
+  <div ref="container" class="container">
     <iframe id="vncFrame" ref="vncFrame" class="frame" frameBorder="0" v-show="true" scrolling="no"></iframe>
   </div>
 </template>
@@ -12,15 +12,12 @@ export default {
   },
   data () {
     return {
-      // stopped -> connected -> disconnected
       vncState: 'stopped',
       config: {
         mode: 'vnc'
       },
       stateID: -1,
-      // retry
       errorMessage: '',
-      // vnc canvas size
       width: 0,
       height: 0,
       fixedResolution: false,
@@ -48,11 +45,30 @@ export default {
   },
   methods: {
     getViewportSize: function () {
+      const container = this.$refs.container
       const frame = this.$refs.vncFrame
+      const width = Math.max(
+        Math.round((container && container.clientWidth) || (frame && frame.clientWidth) || window.innerWidth || 0),
+        1
+      )
+      const height = Math.max(
+        Math.round((container && container.clientHeight) || (frame && frame.clientHeight) || window.innerHeight || 0),
+        1
+      )
       return {
-        w: Math.max(Math.round(frame.clientWidth), 0),
-        h: Math.max(Math.round(frame.clientHeight), 0)
+        w: width,
+        h: height
       }
+    },
+    getDesiredResizeMode: function () {
+      const viewport = this.getViewportSize()
+      if (this.fixedResolution) {
+        return 'scale'
+      }
+      if (viewport.w < 640 || viewport.h < 480) {
+        return 'scale'
+      }
+      return 'remote'
     },
     setupResizeObserver: function () {
       if (!window.ResizeObserver || !this.$refs.container) {
@@ -67,8 +83,11 @@ export default {
       clearTimeout(this.resizeDebounceTimer)
       this.resizeDebounceTimer = setTimeout(() => {
         this.resizeDebounceTimer = null
-        this.setResizeMode('scale')
+        this.applyResizeMode()
       }, 250)
+    },
+    applyResizeMode: function () {
+      this.setResizeMode(this.getDesiredResizeMode())
     },
     setResizeMode: function (mode) {
       this.resizeMode = mode
@@ -88,7 +107,7 @@ export default {
         'h': viewport.h
       }
       try {
-        const response = await this.$http.get('api/state', {params: params})
+        const response = await this.$http.get('api/state', { params: params })
         const body = response.data
         if (body.code !== 200) {
           this.stateErrorCount += 1
@@ -98,12 +117,11 @@ export default {
           }
         }
 
-        // long polling
         this.stateID = body.data.id
         this.width = body.data.width || 0
         this.height = body.data.height || 0
         this.fixedResolution = body.data.config.fixedResolution
-        this.setResizeMode(this.fixedResolution ? 'scale' : 'remote')
+        this.applyResizeMode()
 
         if (this.vncState === 'stopped') {
           this.reconnect(false)
@@ -129,7 +147,7 @@ export default {
       }, afterMseconds)
     },
     reconnect: function (force = false) {
-      console.log(`connecting...`)
+      console.log('connecting...')
       this.errorMessage = ''
       let websockifyPath = location.pathname.substr(1) + 'websockify'
       if (force || this.vncState === 'stopped') {
@@ -139,13 +157,31 @@ export default {
         if (!port) {
           port = window.location.protocol[4] === 's' ? 443 : 80
         }
-        let url = 'static/novnc/vnc.html?'
+        let url = 'static/vnc.html?'
         url += 'autoconnect=1&'
         url += `host=${hostname}&port=${port}&`
         url += `path=${websockifyPath}&title=novnc2&`
-        url += `logging=warn&`
-        url += `resize=${this.resizeMode}`
+        url += 'logging=warn&'
+        url += `resize=${this.resizeMode}&`
+        const storedPassword = this.getStoredVncPassword()
+        if (storedPassword) {
+          url += `password=${encodeURIComponent(storedPassword)}&`
+        }
+        url += `cb=${Date.now()}`
         this.$refs.vncFrame.setAttribute('src', url)
+      }
+    },
+    getStoredVncPassword: function () {
+      try {
+        const urlPassword = new window.URLSearchParams(window.location.search).get('token')
+        if (urlPassword) {
+          return urlPassword
+        }
+        const iframeUrl = new window.URL('static/vnc.html', window.location.href)
+        const storageKey = `novnc:password:${iframeUrl.origin}${iframeUrl.pathname}`
+        return window.sessionStorage.getItem(storageKey) || ''
+      } catch (error) {
+        return ''
       }
     },
     translate: function (key, fallback) {
@@ -162,15 +198,12 @@ export default {
             this.resizeMode = data.mode
           }
           if (data.state === 'connected') {
-            this.setResizeMode(this.resizeMode)
+            this.applyResizeMode()
           }
         }
       } catch (exc) {
-        // SyntaxError if JSON pasrse error
       }
     }
-  },
-  computed: {
   },
   watch: {
   }
@@ -178,8 +211,13 @@ export default {
 </script>
 
 <style scoped>
-body {
-    margin: 0px;
+.container {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    overflow: hidden;
 }
 
 iframe {
