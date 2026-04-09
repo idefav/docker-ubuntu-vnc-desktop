@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/idefav/docker-ubuntu-vnc-desktop/compare/v1.2.0...v1.3.0) (2026-04-09)
+
+
+### Features
+
+* add noVNC text clipboard sync and default Fcitx5 Chinese IME ([2c498ee](https://github.com/idefav/docker-ubuntu-vnc-desktop/commit/2c498eeff51d9b0e087497b7953926021d689ddd))
+
 ## [1.2.0](https://github.com/idefav/docker-ubuntu-vnc-desktop/compare/v1.1.0...v1.2.0) (2026-03-31)
 
 
