@@ -29,3 +29,9 @@
 - Browser clipboard integration is implemented in the custom `web/static/vnc.html` wrapper.
 - The runtime sync target is plain text only.
 - The browser side requires a secure context for reliable clipboard read/write permissions.
+
+## Desktop IME
+
+- The image preinstalls Fcitx5 plus Chinese addons.
+- User initialization writes a managed Fcitx5 profile and GNOME autostart entry.
+- The GNOME session exports Fcitx5 IM environment variables and starts Fcitx5 with Pinyin as the default input method.

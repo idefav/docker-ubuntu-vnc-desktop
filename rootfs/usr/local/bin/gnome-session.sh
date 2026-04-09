@@ -15,6 +15,26 @@ export MOZ_ENABLE_WAYLAND="${MOZ_ENABLE_WAYLAND:-0}"
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/runtime-${USER}}"
 export DBUS_SYSTEM_BUS_ADDRESS="${DBUS_SYSTEM_BUS_ADDRESS:-unix:path=/run/dbus/system_bus_socket}"
 
+is_truthy() {
+    case "${1:-}" in
+        1|true|TRUE|True|yes|YES|Yes|on|ON|On)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+if is_truthy "${DESKTOP_IME_ENABLED:-true}"; then
+    export GTK_IM_MODULE="${GTK_IM_MODULE:-fcitx5}"
+    export QT_IM_MODULE="${QT_IM_MODULE:-fcitx5}"
+    export XMODIFIERS="${XMODIFIERS:-@im=fcitx5}"
+    export SDL_IM_MODULE="${SDL_IM_MODULE:-fcitx5}"
+    export INPUT_METHOD="${INPUT_METHOD:-fcitx5}"
+    export XIM="${XIM:-fcitx5}"
+fi
+
 mkdir -p "$XDG_RUNTIME_DIR"
 chmod 700 "$XDG_RUNTIME_DIR"
 

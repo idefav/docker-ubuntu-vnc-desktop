@@ -72,8 +72,17 @@ RUN set -eux; \
         man-db wget zip unzip rsync openssh-client iputils-ping iproute2 \
         dnsutils traceroute inetutils-telnet netcat-openbsd lsof procps \
         psmisc htop strace'; \
-    for pkg in $base_packages $desktop_packages $dev_packages; do \
+    ime_packages=' \
+        fcitx5 fcitx5-chinese-addons fcitx5-module-cloudpinyin \
+        fcitx5-pinyin-gui fcitx5-config-qt im-config \
+        fcitx5-frontend-gtk3 fcitx5-frontend-gtk4 fcitx5-frontend-qt5'; \
+    for pkg in $base_packages $desktop_packages $dev_packages $ime_packages; do \
         install_pkg "$pkg"; \
+    done; \
+    for pkg in fcitx5-frontend-gtk2 fcitx5-frontend-qt6; do \
+        if apt-cache show "$pkg" >/dev/null 2>&1; then \
+            install_pkg "$pkg"; \
+        fi; \
     done; \
     rm -rf /var/lib/apt/lists/*
 
@@ -213,6 +222,8 @@ RUN chmod +x /startup.sh \
     /usr/local/bin/gnome-session.sh \
     /usr/local/bin/gnome-apply-settings.sh \
     /usr/local/bin/gnome-user-init.sh \
+    /usr/local/bin/install-desktop-ime.sh \
+    /usr/local/bin/start-fcitx5.sh \
     /usr/local/bin/browser-launch \
     /usr/local/bin/system-dbus.sh \
     /usr/local/bin/system-logind.sh \

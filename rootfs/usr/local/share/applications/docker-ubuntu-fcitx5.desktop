@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Docker Ubuntu Fcitx5
+Comment=Start Fcitx5 for the desktop session
+Exec=/usr/local/bin/start-fcitx5.sh
+X-GNOME-Autostart-enabled=true
+NoDisplay=true
+Terminal=false

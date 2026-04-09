@@ -10,6 +10,7 @@ Repository: `https://github.com/idefav/docker-ubuntu-vnc-desktop`
 - GNOME on X11
 - noVNC with server-side resize first, local scaling fallback
 - Browser/system clipboard sync for plain text without using the noVNC clipboard panel
+- Built-in Chinese input method with Fcitx5 Pinyin enabled by default
 - Desktop and Dock favorites for Files, Terminal, Browser, VS Code, Settings
 - Browser launcher prefers Chrome on `amd64`, Chromium on `arm64`
 - Built-in developer toolbox in the runtime image:
@@ -73,9 +74,19 @@ The Makefile always builds with `docker build --network=host`, so host-local pro
 - `VNC_PASSWORD`: optional VNC password
 - `HTTP_PASSWORD`: optional HTTP basic auth password
 - `RELATIVE_URL_ROOT`: optional subpath deployment prefix
+- `DESKTOP_IME_ENABLED`: whether to enable the desktop Chinese input method setup; defaults to `true`
+- `DESKTOP_IME_PRESET`: desktop IME preset; defaults to `fcitx5-sogou`
 - Clipboard sync is text-only and works best over `https://` or `http://127.0.0.1` / `http://localhost`
 
 The desktop container now includes a broader runtime development toolset, so common shell work can happen directly inside the GNOME terminal or VS Code terminal without extra package installation.
+
+The desktop image preinstalls Fcitx5 with Chinese addons and starts with Pinyin available by default. Use `Ctrl+Space` inside the desktop session to toggle the input method.
+
+Disable the desktop IME setup if needed:
+
+```shell
+make run DESKTOP_IME_ENABLED=false
+```
 
 ## VNC Viewer
 
