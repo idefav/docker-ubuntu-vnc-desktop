@@ -74,11 +74,12 @@ build:
 
 run:
 	docker run --privileged --rm \
-		-p 6080:80 -p 5900:5900 \
+		-p 16080:80 -p 5900:5900 \
 		-v /dev/shm:/dev/shm \
 		$(RUN_ADD_HOST) \
 		-e DESKTOP_USERNAME=$(DESKTOP_USERNAME) \
 		-e DESKTOP_PASSWORD=$(DESKTOP_PASSWORD) \
+		-e VNC_PASSWORD=$(VNC_PASSWORD) \
 		-e HTTP_PROXY=$(EFFECTIVE_HTTP_PROXY) \
 		-e HTTPS_PROXY=$(EFFECTIVE_HTTPS_PROXY) \
 		-e ALL_PROXY=$(EFFECTIVE_ALL_PROXY) \

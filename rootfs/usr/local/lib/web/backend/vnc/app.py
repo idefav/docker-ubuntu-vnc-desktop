@@ -6,7 +6,6 @@ from flask import (
     Flask,
     request,
     jsonify,
-    abort,
 )
 from gevent import sleep
 from .response import httperror

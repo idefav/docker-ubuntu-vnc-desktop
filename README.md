@@ -9,6 +9,7 @@ Repository: `https://github.com/idefav/docker-ubuntu-vnc-desktop`
 - Ubuntu 24.04
 - GNOME on X11
 - noVNC with server-side resize first, local scaling fallback
+- Browser/system clipboard sync for plain text without using the noVNC clipboard panel
 - Desktop and Dock favorites for Files, Terminal, Browser, VS Code, Settings
 - Browser launcher prefers Chrome on `amd64`, Chromium on `arm64`
 - Built-in developer toolbox in the runtime image:
@@ -72,6 +73,7 @@ The Makefile always builds with `docker build --network=host`, so host-local pro
 - `VNC_PASSWORD`: optional VNC password
 - `HTTP_PASSWORD`: optional HTTP basic auth password
 - `RELATIVE_URL_ROOT`: optional subpath deployment prefix
+- Clipboard sync is text-only and works best over `https://` or `http://127.0.0.1` / `http://localhost`
 
 The desktop container now includes a broader runtime development toolset, so common shell work can happen directly inside the GNOME terminal or VS Code terminal without extra package installation.
 

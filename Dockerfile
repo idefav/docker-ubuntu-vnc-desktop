@@ -8,6 +8,7 @@ ARG ALL_PROXY
 ARG NO_PROXY
 ARG NVM_VERSION=v0.39.7
 ARG NODE_VERSION=v24
+ARG NOVNC_VERSION=v1.5.0
 ARG NVM_NODEJS_ORG_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/nodejs-release
 ARG NPM_REGISTRY=https://registry.npmmirror.com
 ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
@@ -59,7 +60,7 @@ RUN set -eux; \
         apache2-utils supervisor nginx sudo net-tools zenity xz-utils \
         dbus-x11 dbus-user-session dbus x11-utils alsa-utils mesa-utils \
         libgl1-mesa-dri gdk-pixbuf2.0-bin librsvg2-common \
-        tigervnc-standalone-server tigervnc-tools novnc websockify \
+        tigervnc-standalone-server tigervnc-tools websockify \
         fonts-ubuntu-classic fonts-wqy-zenhei python3-pip python3-dev \
         python3-venv build-essential pkg-config cmake gdb \
         xdg-user-dirs desktop-file-utils'; \
@@ -131,6 +132,7 @@ ARG ALL_PROXY
 ARG NO_PROXY
 ARG NVM_VERSION=v0.39.7
 ARG NODE_VERSION=v24
+ARG NOVNC_VERSION=v1.5.0
 ARG NVM_NODEJS_ORG_MIRROR=https://mirrors.tuna.tsinghua.edu.cn/nodejs-release
 ARG NPM_REGISTRY=https://registry.npmmirror.com
 
@@ -187,19 +189,23 @@ RUN mkdir -p "$NVM_DIR" \
     && ln -sf "$NVM_DIR/current/bin/pnpm" /usr/local/bin/pnpm \
     && rm -f /tmp/install-nvm.sh
 
+RUN mkdir -p /src/novnc \
+    && curl -fsSL "https://github.com/novnc/noVNC/archive/refs/tags/${NOVNC_VERSION}.tar.gz" -o /tmp/novnc.tar.gz \
+    && tar -xzf /tmp/novnc.tar.gz -C /tmp \
+    && cp -a "/tmp/noVNC-${NOVNC_VERSION#v}/." /src/novnc/ \
+    && rm -rf /tmp/novnc.tar.gz "/tmp/noVNC-${NOVNC_VERSION#v}"
+
 COPY web /src/web
 RUN cd /src/web \
     && sed -i 's#https://registry.yarnpkg.com/#https://registry.npmmirror.com/#g' yarn.lock \
     && yarn install --registry "$NPM_REGISTRY" \
-    && yarn build \
-    && if [ -f /src/web/dist/static/novnc/app/ui.js ]; then \
-        sed -i 's#app/locale/#novnc/app/locale/#' /src/web/dist/static/novnc/app/ui.js; \
-    fi
+    && yarn build
 
 FROM system
 LABEL maintainer="fcwu.tw@gmail.com"
 
 COPY --from=builder /src/web/dist/ /usr/local/lib/web/frontend/
+COPY --from=builder /src/novnc/ /usr/local/lib/web/frontend/static/novnc/
 COPY --from=builder /usr/local/nvm/ /usr/local/nvm/
 COPY rootfs /
 RUN chmod +x /startup.sh \
@@ -223,8 +229,7 @@ RUN chmod +x /startup.sh \
     && update-desktop-database /usr/local/share/applications || true \
     && if command -v gdk-pixbuf-query-loaders >/dev/null 2>&1; then \
         gdk-pixbuf-query-loaders --update-cache || true; \
-      fi \
-    && ln -sfn /usr/share/novnc /usr/local/lib/web/frontend/static/novnc
+      fi
 
 EXPOSE 80
 WORKDIR /root

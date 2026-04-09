@@ -36,4 +36,10 @@ for _ in $(seq 1 30); do
     sleep 1
 done
 
-exec dbus-run-session -- bash -lc '/usr/local/bin/gnome-apply-settings.sh & exec gnome-session --session=ubuntu'
+exec dbus-run-session -- bash -lc '
+    /usr/local/bin/gnome-apply-settings.sh &
+    if command -v vncconfig >/dev/null 2>&1; then
+        vncconfig -nowin >/tmp/vncconfig.log 2>&1 &
+    fi
+    exec gnome-session --session=ubuntu
+'
